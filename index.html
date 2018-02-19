@@ -1,3 +1,10 @@
+<!--
+/**
+ * Memory Game - Project for Udacity Frontend Developer Nanodegree
+ * @author: Alex Parra
+ * @date: 2018-02-18
+ */
+-->
 <!doctype html>
 <html lang="en">
 <head>
@@ -16,16 +23,18 @@
     </header>
 
     <section class="score-panel">
+      <span class="moves"><b></b> Moves</span>
       <span class="stars"></span>
-
-      <span class="moves"></span> Moves
-
-      <div class="restart">
-        <i class="fa fa-repeat"></i> <span>Restart</span>
-      </div>
+      <span class="timer"></span>
     </section>
 
-    <ul class="deck"></ul>
+    <div class="deck-wrap">
+      <ul class="deck"></ul>
+    </div>
+
+    <div class="restart">
+      <span><i class="fa fa-repeat"></i> Restart</span>
+    </div>
   </div>
 
   <script src="js/app.js"></script>

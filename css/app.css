@@ -1,3 +1,10 @@
+/**
+ * Memory Game - Project for Udacity Frontend Developer Nanodegree
+ * @author: Alex Parra
+ * @date: 2018-02-18
+ */
+
+
 html {
   box-sizing: border-box;
 }
@@ -26,11 +33,16 @@ body {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  width: 90vw;
+  max-width: calc(18vmin * 4);
+  margin: 0 auto;
+  padding: 20px 0 10px;
 }
 
 h1 {
   font-family: 'Open Sans', sans-serif;
   font-weight: 300;
+  margin: 0 0 10px;
 }
 
 
@@ -39,59 +51,90 @@ h1 {
  */
 
 .score-panel {
-  text-align: left;
-  width: 345px;
-  margin-bottom: 10px;
+  width: 100%;
+  padding: 0 12px 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.score-panel .moves {
+  flex: 0 0 33.33%;
 }
 
 .score-panel .stars {
-  margin: 0;
-  padding: 0;
-  display: inline-block;
-  margin: 0 5px 0 0;
+  flex: 0 0 33.33%;
+  text-align: center;
+  color: #FDB41D;
 }
 
-.score-panel .stars li {
-  list-style: none;
-  display: inline-block;
+.score-panel .stars i {
+  padding: 0 2px;
 }
 
-.score-panel .restart {
-  float: right;
-  cursor: pointer;
+.score-panel .timer {
+  flex: 0 0 33.33%;
+  text-align: right;
 }
-
 
 /*
  * Styles for the deck of cards
  */
+
+.deck-wrap {
+  width: 100%;
+}
 
 .deck {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  width: 660px;
-  min-height: 680px;
-  padding: 32px;
-  margin: 0 0 3em;
+  width: 100%;
+  min-width: 300px;
+  margin: 0;
+  padding: 0 10px 10px;
   background: linear-gradient(160deg, #217EB8 0%, #0C1B36 100%);
   border-radius: 10px;
   box-shadow: 0 0 20px 0 rgba(46, 61, 73, 0.5);
+  list-style: none;
 }
 
 .deck .card {
-  height: 125px;
-  width: 125px;
+  position: relative;
+  flex: 0 0 auto;
+  width: calc(25% - 10px);
+  margin-top: 10px;
   background: #2e3d49;
   font-size: 0;
   color: #fff;
   border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   box-shadow: 5px 2px 20px 0 rgba(46, 61, 73, 0.5);
+  cursor: pointer;
+}
+
+.deck .card::after {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
+  pointer-events: none;
+}
+
+.deck .card i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  font-size: 33px;
+  opacity: 0;
+}
+
+.deck .card.open i {
+  opacity: 1;
+}
+
+.deck .card:not(.open):hover {
+  background: #003341;
 }
 
 .deck .card.open {
@@ -100,13 +143,27 @@ h1 {
   cursor: default;
 }
 
-.deck .card.show {
-  font-size: 33px;
-}
-
-.deck .card.match {
+.deck .card.open.match {
   cursor: default;
-  background: #02ccba;
-  font-size: 33px;
+  background: #02cc13;
 }
 
+.deck .card.open.no-match {
+  cursor: default;
+  background: #cc2a02;
+}
+
+
+.restart {
+  font-size: 13px;
+  padding: 10px 0;
+}
+
+.restart span {
+  cursor: pointer;
+  opacity: .6;
+}
+
+.restart span:hover {
+  opacity: 1;
+}
