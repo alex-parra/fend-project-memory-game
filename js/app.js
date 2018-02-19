@@ -153,7 +153,7 @@ game.addMove = function(){
 game.updateMoves = function(){
   game.ui.moves.textContent = game.moves;
 
-  if( game.moves > 0 && game.moves % game.cards.length === 0 ) {
+  if( game.stars > 1 && game.moves > 0 && game.moves % game.cards.length === 0 ) {
     game.stars--;
     game.uiUpdateStars();
   }
