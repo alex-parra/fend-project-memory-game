@@ -7,11 +7,16 @@
 
 // Game Logic ---------------------------------------------
 
+const utils = {};
+
 const game = {
   stars: null,
   moves: null,
   startTime: null,
+  timer: null,
+  timeToFinish: null,
   pair: [],
+  matches: [],
   ui: {},
   cards: ['anchor', 'bicycle', 'bolt', 'bomb', 'cube', 'diamond', 'leaf', 'paper-plane-o'],
 };
@@ -25,8 +30,10 @@ document.addEventListener('DOMContentLoaded', function(ev){
   game.ui.stars = document.querySelector('.score-panel > .stars');
   game.ui.moves = document.querySelector('.score-panel > .moves > b');
   game.ui.timer = document.querySelector('.score-panel > .timer');
-  game.ui.restart = document.querySelector('.container > .restart > span');
+  game.ui.restart = document.querySelector('.deck-wrap > .restart > span');
+  game.ui.deckWrap = document.querySelector('.deck-wrap');
   game.ui.deck = document.querySelector('.deck-wrap > .deck');
+  game.ui.doneCover = document.querySelector('.deck-wrap > .cover-finished')
 
   game.ui.restart.addEventListener('click', function(ev){
     game.reset();
@@ -43,10 +50,10 @@ document.addEventListener('DOMContentLoaded', function(ev){
 game.start = function(){
   game.ui.deck.addEventListener('click', game.flipCard);
   game.startTime = performance.now();
-
   game.timer = setInterval(function(){
     requestAnimationFrame(function(){
-      game.ui.timer.textContent = ((performance.now() - game.startTime) / 1000).toFixed(0).toHHMMSS();
+      let ellapsed = (performance.now() - game.startTime) / 1000; // seconds
+      game.ui.timer.textContent = utils.toHHMMSS(ellapsed.toFixed(0));
     });
   }, 500);
 }
@@ -60,12 +67,17 @@ game.reset = function(){
   game.moves = 0;
   game.startTime = 0;
   game.pair = [];
+  game.matches = [];
+  clearInterval(game.timer);
+  game.timeToFinish = null;
 
   game.updateMoves();
   game.uiUpdateStars();
   game.uiRenderCards();
   game.ui.timer.textContent = '00:00:00';
-  clearInterval(game.timer);
+
+  utils.removeClass(game.ui.deckWrap, 'finished');
+  game.ui.doneCover.textContent = "";
 
   game.start();
 }
@@ -75,10 +87,10 @@ game.reset = function(){
 
 // Handle card clicks
 game.flipCard = function(ev){
-  if( hasClass(ev.target, 'card') ) {
-    if( hasClass(ev.target, 'open') || hasClass(ev.target, 'match') ) return; // do nothing
+  if( utils.hasClass(ev.target, 'card') ) {
+    if( utils.hasClass(ev.target, 'open') || utils.hasClass(ev.target, 'match') ) return; // do nothing
 
-    addClass(ev.target, 'open');
+    utils.addClass(ev.target, 'open');
 
     game.pair.push(ev.target);
 
@@ -86,9 +98,13 @@ game.flipCard = function(ev){
       game.addMove();
       const [card1, card2] = game.pair;
       if( card1.getAttribute('data-symbol') === card2.getAttribute('data-symbol') ) {
-        addClass(game.pair, 'match');
+        game.matches.push(card1.getAttribute('data-symbol'));
+        utils.addClass(game.pair, 'match');
+        if( game.matches.length === game.cards.length ) {
+          game.finished();
+        }
       } else {
-        addClass(game.pair, 'no-match');
+        utils.addClass(game.pair, 'no-match');
         setTimeout(() => {
           card1.className = 'card';
           card2.className = 'card';
@@ -120,7 +136,7 @@ game.uiUpdateStars = function(){
 // Render the Cards
 game.uiRenderCards = function(){
   let cardsToRender = game.cards.concat(game.cards);
-  cardsToRender = shuffle(cardsToRender);
+  cardsToRender = utils.shuffle(cardsToRender);
 
   const cardsFragment = document.createDocumentFragment();
   cardsToRender.forEach(function(c){
@@ -162,12 +178,32 @@ game.updateMoves = function(){
 
 
 
+game.finished = function(){
+  game.timeToFinish = (performance.now() - game.startTime) / 1000; // seconds
+  clearInterval(game.timer);
+
+  let doneScreenContent = document.createDocumentFragment();
+
+  let doneTitle = document.createElement('h2');
+  doneTitle.textContent = 'Well done!';
+  doneScreenContent.appendChild(doneTitle);
+
+  let doneInfo = document.createElement('p');
+  doneInfo.textContent = 'You found all matches in '+ game.timeToFinish.toFixed(0) +' seconds and '+ game.moves +' pair flips.';
+  doneScreenContent.appendChild(doneInfo);
+
+  game.ui.doneCover.textContent = "";
+  game.ui.doneCover.appendChild(doneScreenContent);
+
+  utils.addClass(game.ui.deckWrap, 'finished');
+}
+
+
 // HELPERS ------------------------------------------------
 
-
 // Convert a string integer to H:i:s
-String.prototype.toHHMMSS = function() {
-  var sec_num = parseInt(this, 10); // don't forget the second param
+utils.toHHMMSS = function(seconds) {
+  var sec_num = parseInt(seconds, 10); // don't forget the second param
   var hours   = Math.floor(sec_num / 3600);
   var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
   var seconds = sec_num - (hours * 3600) - (minutes * 60);
@@ -180,7 +216,7 @@ String.prototype.toHHMMSS = function() {
 
 
 // Shuffle function from http://stackoverflow.com/a/2450976
-function shuffle(array) {
+utils.shuffle = function(array) {
   var currentIndex = array.length, temporaryValue, randomIndex;
 
   while (currentIndex !== 0) {
@@ -198,7 +234,7 @@ function shuffle(array) {
 
 
 // Test if an element has a certain class. Single classes only.
-function hasClass(el, className) {
+utils.hasClass = function(el, className) {
   if (el.classList)
     return el.classList.contains(className)
   else
@@ -209,7 +245,7 @@ function hasClass(el, className) {
 
 
 // Add a class to an element. Single classes only.
-function addClass(elems, className) {
+utils.addClass = function(elems, className) {
   let list = [].concat(elems);
   list.forEach(function(el){
     if (el.classList) {
@@ -224,7 +260,7 @@ function addClass(elems, className) {
 
 
 // Remove a class from an element. Single classes only.
-function removeClass(elems, className) {
+utils.removeClass = function(elems, className) {
   let list = [].concat(elems);
   list.forEach(function(el){
     if (el.classList) {
