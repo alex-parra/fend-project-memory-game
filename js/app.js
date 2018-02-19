@@ -18,7 +18,7 @@ const game = {
   pair: [],
   matches: [],
   ui: {},
-  cards: ['anchor', 'bicycle', 'bolt', 'bomb', 'cube', 'diamond', 'leaf', 'paper-plane-o'],
+  cards: [],
 };
 
 
@@ -33,7 +33,14 @@ document.addEventListener('DOMContentLoaded', function(ev){
   game.ui.restart = document.querySelector('.deck-wrap > .restart > span');
   game.ui.deckWrap = document.querySelector('.deck-wrap');
   game.ui.deck = document.querySelector('.deck-wrap > .deck');
-  game.ui.doneCover = document.querySelector('.deck-wrap > .cover-finished')
+  game.ui.startCover = document.querySelector('.deck-wrap > .cover-start');
+  game.ui.doneCover = document.querySelector('.deck-wrap > .cover-finished');
+
+  game.ui.startCover.addEventListener('click', function(ev){
+    if( utils.hasClass(ev.target, 'start') ) {
+      game.start();
+    }
+  });
 
   game.ui.restart.addEventListener('click', function(ev){
     game.reset();
@@ -49,6 +56,7 @@ document.addEventListener('DOMContentLoaded', function(ev){
 // Start the game
 game.start = function(){
   game.ui.deck.addEventListener('click', game.flipCard);
+  utils.removeClass(game.ui.deckWrap, 'paused');
   game.startTime = performance.now();
   game.timer = setInterval(function(){
     requestAnimationFrame(function(){
@@ -79,7 +87,7 @@ game.reset = function(){
   utils.removeClass(game.ui.deckWrap, 'finished');
   game.ui.doneCover.textContent = "";
 
-  game.start();
+  utils.addClass(game.ui.deckWrap, 'paused');
 }
 
 
@@ -135,6 +143,7 @@ game.uiUpdateStars = function(){
 
 // Render the Cards
 game.uiRenderCards = function(){
+  game.cards = utils.iconsNames(8);
   let cardsToRender = game.cards.concat(game.cards);
   cardsToRender = utils.shuffle(cardsToRender);
 
@@ -143,9 +152,15 @@ game.uiRenderCards = function(){
     let card = document.createElement('li');
     card.className = 'card';
     card.setAttribute('data-symbol', c);
+
+    let cardInner = document.createElement('span');
+
     let cardIcon = document.createElement('i');
     cardIcon.className = 'fa fa-'+ c;
-    card.appendChild(cardIcon);
+
+    cardInner.appendChild(cardIcon);
+    card.appendChild(cardInner);
+
     cardsFragment.appendChild(card);
   });
 
@@ -169,7 +184,8 @@ game.addMove = function(){
 game.updateMoves = function(){
   game.ui.moves.textContent = game.moves;
 
-  if( game.stars > 1 && game.moves > 0 && game.moves % game.cards.length === 0 ) {
+  let threshold = game.cards.length + 5;
+  if( game.stars > 1 && game.moves > 0 && game.moves % threshold === 0 ) {
     game.stars--;
     game.uiUpdateStars();
   }
@@ -185,7 +201,17 @@ game.finished = function(){
   let doneScreenContent = document.createDocumentFragment();
 
   let doneTitle = document.createElement('h2');
-  doneTitle.textContent = 'Well done!';
+  switch( game.stars ) {
+    case 1:
+      doneTitle.textContent = 'You can do better!';
+      break;
+    case 2:
+      doneTitle.textContent = 'Well done!';
+      break;
+    case 3:
+      doneTitle.textContent = 'WOW WOW WOW!';
+      break;
+  }
   doneScreenContent.appendChild(doneTitle);
 
   let doneInfo = document.createElement('p');
@@ -270,4 +296,35 @@ utils.removeClass = function(elems, className) {
       el.className=el.className.replace(reg, ' ')
     }
   });
+}
+
+
+
+utils.iconsNames = function(limit){
+  const icons = [
+    'amazon',
+    'ambulance',
+    'anchor',
+    'android',
+    'apple',
+    'bicycle',
+    'bitcoin',
+    'bolt',
+    'bomb',
+    'css3',
+    'cube',
+    'diamond',
+    'drupal',
+    'facebook-square',
+    'firefox',
+    'github',
+    'heartbeat',
+    'leaf',
+    'linux',
+    'paper-plane-o',
+    'pinterest',
+    'rebel',
+  ];
+
+  return utils.shuffle(icons).slice(0, limit);
 }

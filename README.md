@@ -4,7 +4,8 @@ by Alex Parra
 
 
 ## To do list
-- Start screen
+- ~~Start screen~~
 - ~~Game finished: show congrats~~
 - ~~Game finished: freeze timer~~
-- Card flip animations
+- ~~Card flip animations~~
+- ~~Extended list of icons~~
