@@ -274,6 +274,11 @@ h1 {
 
 
 
+@media screen and (max-width: 600px) {
+  .container { width: auto; max-width: none; margin: 0 10px; }
+}
+
+
 
 
 /* https://css-tricks.com/snippets/css/shake-css-keyframe-animation/ */
