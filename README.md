@@ -3,6 +3,9 @@
 by Alex Parra
 
 
+Play at http://memorygame.alexpds.com/
+
+
 ## To do list
 - ~~Start screen~~
 - ~~Game finished: show congrats~~
